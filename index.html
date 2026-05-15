@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Entry — Section A & B</title>
+<title>TAT Status — PCR & Serology</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -43,17 +43,15 @@
   }
 
   .container {
-    max-width: 960px;
+    max-width: 980px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
   }
 
+  /* HEADER */
   header {
     margin-bottom: 48px;
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
   }
 
   header h1 {
@@ -61,13 +59,16 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     color: var(--text);
+    line-height: 1.1;
   }
 
-  header span {
+  header p {
+    margin-top: 5px;
     font-family: var(--mono);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--muted);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   /* SECTION */
@@ -98,27 +99,17 @@
   }
 
   .section-badge {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 800;
     flex-shrink: 0;
   }
 
   .section-a .section-badge { background: rgba(79,255,176,0.12); color: var(--accent-a); border: 1px solid rgba(79,255,176,0.25); }
   .section-b .section-badge { background: rgba(255,107,107,0.12); color: var(--accent-b); border: 1px solid rgba(255,107,107,0.25); }
 
-  .section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-  }
-
+  .section-title { font-size: 1rem; font-weight: 700; }
   .section-a .section-title { color: var(--accent-a); }
   .section-b .section-title { color: var(--accent-b); }
 
@@ -134,22 +125,14 @@
   }
 
   /* TABLE */
-  .table-wrap {
-    overflow-x: auto;
-  }
+  .table-wrap { overflow-x: auto; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
 
-  thead tr {
-    background: var(--input-bg);
-  }
+  thead tr { background: var(--input-bg); }
 
   th {
-    padding: 10px 16px;
+    padding: 10px 14px;
     text-align: left;
     font-family: var(--mono);
     font-size: 0.68rem;
@@ -160,24 +143,21 @@
     white-space: nowrap;
   }
 
-  th.col-num { width: 42px; color: #4a5470; }
-  th.col-text { width: 42%; }
-  th.col-time { width: 22%; }
-  th.col-updated { width: 28%; }
+  th.col-num   { width: 42px; color: #4a5470; text-align: center; }
+  th.col-name  { width: 36%; }
+  th.col-tat   { width: 100px; text-align: center; }
+  th.col-time  { width: 22%; }
+  th.col-updated { width: auto; }
   th.col-action { width: 44px; }
 
   tbody tr {
     border-bottom: 1px solid rgba(42,49,71,0.6);
     transition: background 0.15s;
   }
-
   tbody tr:hover { background: rgba(255,255,255,0.025); }
   tbody tr:last-child { border-bottom: none; }
 
-  td {
-    padding: 8px 10px;
-    vertical-align: middle;
-  }
+  td { padding: 8px 10px; vertical-align: middle; }
 
   td.col-num {
     font-family: var(--mono);
@@ -188,22 +168,20 @@
     user-select: none;
   }
 
+  td.col-tat { text-align: center; }
+
   td.col-updated {
     font-family: var(--mono);
     font-size: 0.72rem;
     color: var(--muted);
-    padding: 8px 16px;
+    padding: 8px 14px;
   }
 
-  td.col-action {
-    text-align: center;
-    padding: 8px 4px;
-  }
+  td.col-action { text-align: center; padding: 8px 4px; }
 
   /* INPUTS */
   input[type="text"],
-  input[type="time"],
-  input[type="datetime-local"] {
+  input[type="time"] {
     width: 100%;
     background: var(--input-bg);
     border: 1px solid var(--border);
@@ -216,8 +194,7 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  input[type="time"],
-  input[type="datetime-local"] {
+  input[type="time"] {
     font-family: var(--mono);
     font-size: 0.78rem;
     color: var(--muted);
@@ -236,6 +213,105 @@
 
   input::placeholder { color: #3d4865; }
 
+  /* CHECKBOX */
+  .tat-checkbox-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tat-checkbox-wrap input[type="checkbox"] {
+    display: none;
+  }
+
+  .tat-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 26px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--input-bg);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    user-select: none;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tat-toggle::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    opacity: 0.4;
+  }
+
+  .tat-toggle .toggle-label {
+    margin-left: 10px;
+    transition: margin 0.2s;
+  }
+
+  /* Checked state — section A */
+  .section-a input[type="checkbox"]:checked + .tat-toggle {
+    border-color: var(--accent-a);
+    background: rgba(79,255,176,0.08);
+    color: var(--accent-a);
+  }
+
+  .section-a input[type="checkbox"]:checked + .tat-toggle::before {
+    left: calc(100% - 22px);
+    background: var(--accent-a);
+    opacity: 1;
+  }
+
+  .section-a input[type="checkbox"]:checked + .tat-toggle .toggle-label {
+    margin-left: -10px;
+    margin-right: 10px;
+  }
+
+  /* Checked state — section B */
+  .section-b input[type="checkbox"]:checked + .tat-toggle {
+    border-color: var(--accent-b);
+    background: rgba(255,107,107,0.08);
+    color: var(--accent-b);
+  }
+
+  .section-b input[type="checkbox"]:checked + .tat-toggle::before {
+    left: calc(100% - 22px);
+    background: var(--accent-b);
+    opacity: 1;
+  }
+
+  .section-b input[type="checkbox"]:checked + .tat-toggle .toggle-label {
+    margin-left: -10px;
+    margin-right: 10px;
+  }
+
+  /* Time cell states */
+  .time-cell { transition: opacity 0.2s; }
+
+  .no-tat-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: #4a5470;
+    background: rgba(42,49,71,0.5);
+    border: 1px solid #2a3147;
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
+
   /* DELETE BUTTON */
   .btn-del {
     background: none;
@@ -244,35 +320,27 @@
     color: #3d4560;
     font-size: 1rem;
     line-height: 1;
-    width: 28px;
-    height: 28px;
+    width: 28px; height: 28px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
   }
-
   .btn-del:hover { background: rgba(255,80,80,0.12); border-color: rgba(255,80,80,0.25); color: #ff6b6b; }
 
-  /* ADD ROW BUTTON */
+  /* ADD ROW */
   .add-row-wrap {
     padding: 12px 16px;
     border-top: 1px dashed var(--border);
-    background: transparent;
   }
 
   .btn-add {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex; align-items: center; gap: 8px;
     background: none;
     border: 1px dashed var(--border);
     border-radius: var(--radius);
     color: var(--muted);
     font-family: var(--sans);
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.8rem; font-weight: 600;
     padding: 7px 14px;
     cursor: pointer;
     transition: all 0.2s;
@@ -281,14 +349,11 @@
 
   .section-a .btn-add:hover { border-color: var(--accent-a); color: var(--accent-a); background: rgba(79,255,176,0.05); }
   .section-b .btn-add:hover { border-color: var(--accent-b); color: var(--accent-b); background: rgba(255,107,107,0.05); }
-
   .btn-add svg { width: 14px; height: 14px; }
 
   /* FOOTER */
   .footer-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
     padding: 10px 24px;
     border-top: 1px solid var(--border);
     background: var(--input-bg);
@@ -305,36 +370,36 @@
     margin-right: 6px;
     animation: pulse 2s ease-in-out infinite;
   }
+  .section-b .live-dot { background: var(--accent-b); }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
   }
-
-  .section-b .live-dot { background: var(--accent-b); }
 </style>
 </head>
 <body>
 <div class="container">
 
   <header>
-    <h1>Data Entry</h1>
-    <span>SECTION A &amp; B</span>
+    <h1>TAT Status</h1>
+    <p>PCR &amp; Serology</p>
   </header>
 
-  <!-- SECTION A -->
+  <!-- SEROLOGY (A) -->
   <div class="section section-a" id="section-a">
     <div class="section-header">
-      <div class="section-badge">A</div>
-      <div class="section-title">Section A</div>
-      <div class="row-count" id="count-a">0 rows</div>
+      <div class="section-badge">S</div>
+      <div class="section-title">Serology</div>
+      <div class="row-count" id="count-a">0 tests</div>
     </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th class="col-num">#</th>
-            <th class="col-text">TEXT DATA</th>
+            <th class="col-name">TEST NAME</th>
+            <th class="col-tat">TAT</th>
             <th class="col-time">TIME</th>
             <th class="col-updated">LAST UPDATED</th>
             <th class="col-action"></th>
@@ -346,28 +411,29 @@
     <div class="add-row-wrap">
       <button class="btn-add" onclick="addRow('a')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Row
+        Add Test
       </button>
     </div>
     <div class="footer-bar">
       <span><span class="live-dot"></span>Live tracking updates</span>
-      <span id="footer-a">Section A</span>
+      <span id="footer-a">Serology</span>
     </div>
   </div>
 
-  <!-- SECTION B -->
+  <!-- PCR (B) -->
   <div class="section section-b" id="section-b">
     <div class="section-header">
-      <div class="section-badge">B</div>
-      <div class="section-title">Section B</div>
-      <div class="row-count" id="count-b">0 rows</div>
+      <div class="section-badge">P</div>
+      <div class="section-title">PCR</div>
+      <div class="row-count" id="count-b">0 tests</div>
     </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th class="col-num">#</th>
-            <th class="col-text">TEXT DATA</th>
+            <th class="col-name">TEST NAME</th>
+            <th class="col-tat">TAT</th>
             <th class="col-time">TIME</th>
             <th class="col-updated">LAST UPDATED</th>
             <th class="col-action"></th>
@@ -379,12 +445,12 @@
     <div class="add-row-wrap">
       <button class="btn-add" onclick="addRow('b')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Row
+        Add Test
       </button>
     </div>
     <div class="footer-bar">
       <span><span class="live-dot"></span>Live tracking updates</span>
-      <span id="footer-b">Section B</span>
+      <span id="footer-b">PCR</span>
     </div>
   </div>
 
@@ -403,6 +469,7 @@
     rowCounters[section]++;
     const idx = rowCounters[section];
     const id = `row-${section}-${idx}`;
+    const cbId = `cb-${id}`;
 
     const tr = document.createElement('tr');
     tr.id = id;
@@ -410,33 +477,48 @@
     tr.innerHTML = `
       <td class="col-num">${idx}</td>
       <td>
-        <input type="text" placeholder="Enter text data…"
+        <input type="text" placeholder="Enter test name…"
           oninput="onFieldChange('${id}', '${section}')"
           onchange="onFieldChange('${id}', '${section}')">
       </td>
-      <td>
-        <input type="time"
-          oninput="onFieldChange('${id}', '${section}')"
-          onchange="onFieldChange('${id}', '${section}')">
+      <td class="col-tat">
+        <label class="tat-checkbox-wrap">
+          <input type="checkbox" id="${cbId}" onchange="onTatToggle('${id}', '${section}')">
+          <span class="tat-toggle"><span class="toggle-label">TAT</span></span>
+        </label>
+      </td>
+      <td class="col-time time-cell" id="time-cell-${id}">
+        <span class="no-tat-badge">NO TAT</span>
       </td>
       <td class="col-updated" id="updated-${id}">—</td>
       <td class="col-action">
-        <button class="btn-del" title="Delete row" onclick="deleteRow('${id}', '${section}')">✕</button>
+        <button class="btn-del" title="Delete" onclick="deleteRow('${id}', '${section}')">✕</button>
       </td>
     `;
 
     tbody.appendChild(tr);
     updateCount(section);
-
-    // focus the text input
     tr.querySelector('input[type="text"]').focus();
+  }
+
+  function onTatToggle(rowId, section) {
+    const cb = document.getElementById(`cb-${rowId}`);
+    const timeCell = document.getElementById(`time-cell-${rowId}`);
+
+    if (cb.checked) {
+      timeCell.innerHTML = `<input type="time"
+        oninput="onFieldChange('${rowId}', '${section}')"
+        onchange="onFieldChange('${rowId}', '${section}')">`;
+      timeCell.querySelector('input').focus();
+    } else {
+      timeCell.innerHTML = `<span class="no-tat-badge">NO TAT</span>`;
+    }
+    onFieldChange(rowId, section);
   }
 
   function onFieldChange(rowId, section) {
     const cell = document.getElementById(`updated-${rowId}`);
-    if (cell) {
-      cell.textContent = formatDateTime(new Date());
-    }
+    if (cell) cell.textContent = formatDateTime(new Date());
     updateFooter(section);
   }
 
@@ -444,22 +526,19 @@
     const row = document.getElementById(rowId);
     if (row) row.remove();
     updateCount(section);
-    // Renumber
-    const tbody = document.getElementById(`tbody-${section}`);
-    tbody.querySelectorAll('tr').forEach((tr, i) => {
+    document.getElementById(`tbody-${section}`).querySelectorAll('tr').forEach((tr, i) => {
       tr.querySelector('.col-num').textContent = i + 1;
     });
   }
 
   function updateCount(section) {
-    const tbody = document.getElementById(`tbody-${section}`);
-    const n = tbody.querySelectorAll('tr').length;
-    document.getElementById(`count-${section}`).textContent = `${n} row${n !== 1 ? 's' : ''}`;
+    const n = document.getElementById(`tbody-${section}`).querySelectorAll('tr').length;
+    document.getElementById(`count-${section}`).textContent = `${n} test${n !== 1 ? 's' : ''}`;
     updateFooter(section);
   }
 
   function updateFooter(section) {
-    const label = section === 'a' ? 'Section A' : 'Section B';
+    const label = section === 'a' ? 'Serology' : 'PCR';
     document.getElementById(`footer-${section}`).textContent =
       `${label} · Last edit: ${formatDateTime(new Date())}`;
   }
