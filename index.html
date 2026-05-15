@@ -4,21 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TAT Status — PCR & Serology</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
   :root {
-    --bg: #0d0f14;
-    --surface: #161a23;
-    --surface2: #1e2433;
-    --border: #2a3147;
-    --accent-a: #4fffb0;
-    --accent-b: #ff6b6b;
-    --text: #e8ecf4;
-    --muted: #7a849e;
-    --input-bg: #111520;
-    --radius: 6px;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --bg:       #f2f4f7;
+    --surface:  #ffffff;
+    --surface2: #f8f9fb;
+    --border:   #e3e7ef;
+    --border2:  #ccd2e0;
+    --accent-a: #1a7f5a;
+    --accent-b: #c0392b;
+    --text:     #1a1d23;
+    --muted:    #8a93a8;
+    --input-bg: #f4f5f8;
+    --shadow:   0 1px 4px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.05);
+    --radius:   7px;
+    --mono:     'DM Mono', monospace;
+    --sans:     'DM Sans', sans-serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,156 +35,162 @@
     color: var(--text);
     font-family: var(--sans);
     min-height: 100vh;
-    padding: 40px 24px 60px;
+    padding: 36px 20px 60px;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 10% 10%, rgba(79,255,176,0.05) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 90% 90%, rgba(255,107,107,0.05) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    max-width: 980px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
+  .container { max-width: 960px; margin: 0 auto; }
 
   /* HEADER */
   header {
-    margin-bottom: 48px;
+    margin-bottom: 36px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  header h1 {
-    font-size: 2rem;
-    font-weight: 800;
+  .header-left h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
     letter-spacing: -0.03em;
     color: var(--text);
-    line-height: 1.1;
   }
 
-  header p {
-    margin-top: 5px;
+  .header-left p {
+    margin-top: 3px;
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--muted);
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
+
+  .sync-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .sync-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: background 0.4s;
+    flex-shrink: 0;
+  }
+  .sync-dot.live  { background: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.2); }
+  .sync-dot.error { background: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.2); }
 
   /* SECTION */
   .section {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
     overflow: hidden;
-    animation: fadeUp 0.5s ease both;
+    animation: fadeUp 0.4s ease both;
   }
 
-  .section:nth-child(2) { animation-delay: 0.1s; }
-  .section:nth-child(3) { animation-delay: 0.2s; }
+  .section:nth-child(2) { animation-delay: 0.06s; }
+  .section:nth-child(3) { animation-delay: 0.12s; }
 
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
+    from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   .section-header {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 18px 24px;
+    gap: 12px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
     background: var(--surface2);
   }
 
   .section-badge {
-    width: 36px; height: 36px;
+    width: 32px; height: 32px;
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.85rem; font-weight: 800;
+    font-size: 0.8rem; font-weight: 700;
     flex-shrink: 0;
   }
 
-  .section-a .section-badge { background: rgba(79,255,176,0.12); color: var(--accent-a); border: 1px solid rgba(79,255,176,0.25); }
-  .section-b .section-badge { background: rgba(255,107,107,0.12); color: var(--accent-b); border: 1px solid rgba(255,107,107,0.25); }
+  .section-a .section-badge { background: #e8f5f0; color: var(--accent-a); border: 1px solid #b8ddd1; }
+  .section-b .section-badge { background: #fdecea; color: var(--accent-b); border: 1px solid #f1bdb9; }
 
-  .section-title { font-size: 1rem; font-weight: 700; }
-  .section-a .section-title { color: var(--accent-a); }
-  .section-b .section-title { color: var(--accent-b); }
+  .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
 
   .row-count {
     margin-left: auto;
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.63rem;
     color: var(--muted);
-    background: var(--input-bg);
+    background: white;
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 3px 10px;
+    padding: 2px 10px;
   }
 
   /* TABLE */
   .table-wrap { overflow-x: auto; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 
-  thead tr { background: var(--input-bg); }
+  thead tr { background: var(--surface2); }
 
   th {
-    padding: 10px 14px;
+    padding: 9px 14px;
     text-align: left;
     font-family: var(--mono);
-    font-size: 0.68rem;
+    font-size: 0.61rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     color: var(--muted);
     border-bottom: 1px solid var(--border);
     white-space: nowrap;
   }
 
-  th.col-num   { width: 42px; color: #4a5470; text-align: center; }
-  th.col-name  { width: 36%; }
-  th.col-tat   { width: 100px; text-align: center; }
-  th.col-time  { width: 22%; }
-  th.col-updated { width: auto; }
-  th.col-action { width: 44px; }
+  th.col-num  { width: 40px; text-align: center; }
+  th.col-name { width: 36%; }
+  th.col-tat  { width: 90px; text-align: center; }
+  th.col-time { width: 20%; }
+  th.col-upd  { }
+  th.col-act  { width: 40px; }
 
-  tbody tr {
-    border-bottom: 1px solid rgba(42,49,71,0.6);
-    transition: background 0.15s;
-  }
-  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  tbody tr { border-bottom: 1px solid rgba(227,231,239,0.8); transition: background 0.1s; }
+  tbody tr:hover { background: #fafbfc; }
   tbody tr:last-child { border-bottom: none; }
 
-  td { padding: 8px 10px; vertical-align: middle; }
+  td { padding: 7px 10px; vertical-align: middle; }
 
   td.col-num {
     font-family: var(--mono);
-    font-size: 0.68rem;
-    color: #3d4560;
+    font-size: 0.63rem;
+    color: #c8cdd8;
     text-align: center;
-    padding: 8px 4px;
     user-select: none;
   }
 
-  td.col-tat { text-align: center; }
-
-  td.col-updated {
+  td.col-upd {
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.66rem;
     color: var(--muted);
-    padding: 8px 14px;
+    padding: 7px 14px;
   }
 
-  td.col-action { text-align: center; padding: 8px 4px; }
+  td.col-tat { text-align: center; }
+  td.col-act { text-align: center; padding: 7px 4px; }
 
   /* INPUTS */
   input[type="text"],
@@ -188,54 +201,33 @@
     border-radius: var(--radius);
     color: var(--text);
     font-family: var(--sans);
-    font-size: 0.85rem;
-    padding: 7px 10px;
+    font-size: 0.83rem;
+    padding: 6px 10px;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.18s, box-shadow 0.18s;
   }
 
-  input[type="time"] {
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
+  input[type="time"] { font-family: var(--mono); font-size: 0.76rem; }
 
-  input:focus {
-    border-color: rgba(79,255,176,0.4);
-    box-shadow: 0 0 0 3px rgba(79,255,176,0.07);
-    color: var(--text);
-  }
+  .section-a input:focus { border-color: #6abf9e; box-shadow: 0 0 0 3px rgba(26,127,90,0.07); }
+  .section-b input:focus { border-color: #e07070; box-shadow: 0 0 0 3px rgba(192,57,43,0.07); }
+  input::placeholder { color: #c5cad6; }
 
-  .section-b input:focus {
-    border-color: rgba(255,107,107,0.4);
-    box-shadow: 0 0 0 3px rgba(255,107,107,0.07);
-  }
-
-  input::placeholder { color: #3d4865; }
-
-  /* CHECKBOX */
-  .tat-checkbox-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .tat-checkbox-wrap input[type="checkbox"] {
-    display: none;
-  }
+  /* TAT TOGGLE */
+  .tat-cb-wrap { display: flex; align-items: center; justify-content: center; }
+  .tat-cb-wrap input[type="checkbox"] { display: none; }
 
   .tat-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 64px;
-    height: 26px;
+    width: 62px; height: 24px;
     border-radius: 20px;
-    border: 1.5px solid var(--border);
+    border: 1.5px solid var(--border2);
     background: var(--input-bg);
     cursor: pointer;
     font-family: var(--mono);
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     font-weight: 500;
     letter-spacing: 0.06em;
     color: var(--muted);
@@ -248,146 +240,108 @@
   .tat-toggle::before {
     content: '';
     position: absolute;
-    left: 4px;
-    width: 18px; height: 18px;
+    left: 3px;
+    width: 16px; height: 16px;
     border-radius: 50%;
-    background: var(--muted);
+    background: #ccc;
     transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-    opacity: 0.4;
+    opacity: 0.5;
   }
 
-  .tat-toggle .toggle-label {
-    margin-left: 10px;
-    transition: margin 0.2s;
-  }
+  .tat-toggle .tlabel { margin-left: 8px; transition: margin 0.2s; }
 
-  /* Checked state — section A */
-  .section-a input[type="checkbox"]:checked + .tat-toggle {
-    border-color: var(--accent-a);
-    background: rgba(79,255,176,0.08);
-    color: var(--accent-a);
-  }
+  .section-a .tat-cb-wrap input:checked + .tat-toggle { border-color: var(--accent-a); background: #eaf7f2; color: var(--accent-a); }
+  .section-a .tat-cb-wrap input:checked + .tat-toggle::before { left: calc(100% - 20px); background: var(--accent-a); opacity: 1; }
+  .section-a .tat-cb-wrap input:checked + .tat-toggle .tlabel { margin-left: -8px; margin-right: 8px; }
 
-  .section-a input[type="checkbox"]:checked + .tat-toggle::before {
-    left: calc(100% - 22px);
-    background: var(--accent-a);
-    opacity: 1;
-  }
+  .section-b .tat-cb-wrap input:checked + .tat-toggle { border-color: var(--accent-b); background: #fef1f0; color: var(--accent-b); }
+  .section-b .tat-cb-wrap input:checked + .tat-toggle::before { left: calc(100% - 20px); background: var(--accent-b); opacity: 1; }
+  .section-b .tat-cb-wrap input:checked + .tat-toggle .tlabel { margin-left: -8px; margin-right: 8px; }
 
-  .section-a input[type="checkbox"]:checked + .tat-toggle .toggle-label {
-    margin-left: -10px;
-    margin-right: 10px;
-  }
-
-  /* Checked state — section B */
-  .section-b input[type="checkbox"]:checked + .tat-toggle {
-    border-color: var(--accent-b);
-    background: rgba(255,107,107,0.08);
-    color: var(--accent-b);
-  }
-
-  .section-b input[type="checkbox"]:checked + .tat-toggle::before {
-    left: calc(100% - 22px);
-    background: var(--accent-b);
-    opacity: 1;
-  }
-
-  .section-b input[type="checkbox"]:checked + .tat-toggle .toggle-label {
-    margin-left: -10px;
-    margin-right: 10px;
-  }
-
-  /* Time cell states */
-  .time-cell { transition: opacity 0.2s; }
-
+  /* NO TAT badge */
   .no-tat-badge {
     display: inline-block;
     font-family: var(--mono);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     letter-spacing: 0.06em;
-    color: #4a5470;
-    background: rgba(42,49,71,0.5);
-    border: 1px solid #2a3147;
+    color: #b8bfcc;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 3px 8px;
   }
 
-  /* DELETE BUTTON */
+  /* DELETE */
   .btn-del {
     background: none;
     border: 1px solid transparent;
     border-radius: 5px;
-    color: #3d4560;
-    font-size: 1rem;
-    line-height: 1;
-    width: 28px; height: 28px;
+    color: #cdd0da;
+    font-size: 0.85rem;
+    width: 26px; height: 26px;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
   }
-  .btn-del:hover { background: rgba(255,80,80,0.12); border-color: rgba(255,80,80,0.25); color: #ff6b6b; }
+  .btn-del:hover { background: #fdecea; border-color: #f1bdb9; color: var(--accent-b); }
 
   /* ADD ROW */
-  .add-row-wrap {
-    padding: 12px 16px;
-    border-top: 1px dashed var(--border);
-  }
+  .add-row-wrap { padding: 10px 16px; border-top: 1px dashed var(--border); }
 
   .btn-add {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 7px;
     background: none;
-    border: 1px dashed var(--border);
+    border: 1px dashed var(--border2);
     border-radius: var(--radius);
     color: var(--muted);
     font-family: var(--sans);
-    font-size: 0.8rem; font-weight: 600;
-    padding: 7px 14px;
+    font-size: 0.78rem; font-weight: 600;
+    padding: 6px 14px;
     cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.02em;
+    transition: all 0.18s;
   }
 
-  .section-a .btn-add:hover { border-color: var(--accent-a); color: var(--accent-a); background: rgba(79,255,176,0.05); }
-  .section-b .btn-add:hover { border-color: var(--accent-b); color: var(--accent-b); background: rgba(255,107,107,0.05); }
-  .btn-add svg { width: 14px; height: 14px; }
+  .section-a .btn-add:hover { border-color: var(--accent-a); color: var(--accent-a); background: #f0faf6; }
+  .section-b .btn-add:hover { border-color: var(--accent-b); color: var(--accent-b); background: #fdf4f4; }
+  .btn-add svg { width: 13px; height: 13px; }
 
-  /* FOOTER */
-  .footer-bar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 24px;
-    border-top: 1px solid var(--border);
-    background: var(--input-bg);
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    color: var(--muted);
+  /* SETUP NOTICE */
+  #setup-notice {
+    display: none;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    font-size: 0.82rem;
+    color: #78350f;
+    line-height: 1.6;
   }
-
-  .live-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent-a);
-    margin-right: 6px;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  .section-b .live-dot { background: var(--accent-b); }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  #setup-notice strong { display: block; margin-bottom: 4px; }
+  #setup-notice code { background: #fef3c7; border-radius: 3px; padding: 1px 5px; font-size: 0.78rem; }
 </style>
 </head>
 <body>
 <div class="container">
 
   <header>
-    <h1>TAT Status</h1>
-    <p>PCR &amp; Serology</p>
+    <div class="header-left">
+      <h1>TAT Status</h1>
+      <p>PCR &amp; Serology</p>
+    </div>
+    <div class="sync-badge">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-label">Connecting…</span>
+    </div>
   </header>
 
-  <!-- SEROLOGY (A) -->
-  <div class="section section-a" id="section-a">
+  <div id="setup-notice">
+    <strong>⚙️ Firebase setup required for real-time sync</strong>
+    Open this file in a text editor and replace the Firebase config values (apiKey, databaseURL, etc.) with your own project's credentials from <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>. The page works offline until then.
+  </div>
+
+  <!-- SEROLOGY -->
+  <div class="section section-a">
     <div class="section-header">
       <div class="section-badge">S</div>
       <div class="section-title">Serology</div>
@@ -395,16 +349,14 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th class="col-num">#</th>
-            <th class="col-name">TEST NAME</th>
-            <th class="col-tat">TAT</th>
-            <th class="col-time">TIME</th>
-            <th class="col-updated">LAST UPDATED</th>
-            <th class="col-action"></th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th class="col-num">#</th>
+          <th class="col-name">TEST NAME</th>
+          <th class="col-tat">TAT</th>
+          <th class="col-time">TIME</th>
+          <th class="col-upd">LAST UPDATED</th>
+          <th class="col-act"></th>
+        </tr></thead>
         <tbody id="tbody-a"></tbody>
       </table>
     </div>
@@ -414,14 +366,10 @@
         Add Test
       </button>
     </div>
-    <div class="footer-bar">
-      <span><span class="live-dot"></span>Live tracking updates</span>
-      <span id="footer-a">Serology</span>
-    </div>
   </div>
 
-  <!-- PCR (B) -->
-  <div class="section section-b" id="section-b">
+  <!-- PCR -->
+  <div class="section section-b">
     <div class="section-header">
       <div class="section-badge">P</div>
       <div class="section-title">PCR</div>
@@ -429,16 +377,14 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th class="col-num">#</th>
-            <th class="col-name">TEST NAME</th>
-            <th class="col-tat">TAT</th>
-            <th class="col-time">TIME</th>
-            <th class="col-updated">LAST UPDATED</th>
-            <th class="col-action"></th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th class="col-num">#</th>
+          <th class="col-name">TEST NAME</th>
+          <th class="col-tat">TAT</th>
+          <th class="col-time">TIME</th>
+          <th class="col-upd">LAST UPDATED</th>
+          <th class="col-act"></th>
+        </tr></thead>
         <tbody id="tbody-b"></tbody>
       </table>
     </div>
@@ -448,104 +394,217 @@
         Add Test
       </button>
     </div>
-    <div class="footer-bar">
-      <span><span class="live-dot"></span>Live tracking updates</span>
-      <span id="footer-b">PCR</span>
-    </div>
   </div>
 
 </div>
 
 <script>
-  let rowCounters = { a: 0, b: 0 };
+// ════════════════════════════════════════════════════════════════════
+// FIREBASE CONFIG — Replace with YOUR project values
+// ════════════════════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId:         "YOUR_PROJECT",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+// ════════════════════════════════════════════════════════════════════
 
-  function formatDateTime(d) {
-    const pad = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const state = { a: [], b: [] };
+let db = null;
+let suppressSave = false;
+let todayKey = getISTDateKey();
+
+// ── IST date key ──────────────────────────────────────────────────
+function getISTDateKey() {
+  const ist = new Date(Date.now() + 5.5 * 3600000);
+  return ist.toISOString().slice(0, 10);
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function formatDT(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+// ── Sync status ───────────────────────────────────────────────────
+function setSyncStatus(s) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (s==='live')  { dot.className='sync-dot live';  lbl.textContent='Synced'; }
+  if (s==='error') { dot.className='sync-dot error'; lbl.textContent='Offline — local only'; }
+  if (s==='wait')  { dot.className='sync-dot';       lbl.textContent='Connecting…'; }
+}
+
+// ── Firebase init ─────────────────────────────────────────────────
+function initFirebase() {
+  if (FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY') {
+    document.getElementById('setup-notice').style.display = 'block';
+    setSyncStatus('error');
+    // Still run in local-only mode
+    startLocalMode();
+    return;
   }
-
-  function addRow(section) {
-    const tbody = document.getElementById(`tbody-${section}`);
-    rowCounters[section]++;
-    const idx = rowCounters[section];
-    const id = `row-${section}-${idx}`;
-    const cbId = `cb-${id}`;
-
-    const tr = document.createElement('tr');
-    tr.id = id;
-
-    tr.innerHTML = `
-      <td class="col-num">${idx}</td>
-      <td>
-        <input type="text" placeholder="Enter test name…"
-          oninput="onFieldChange('${id}', '${section}')"
-          onchange="onFieldChange('${id}', '${section}')">
-      </td>
-      <td class="col-tat">
-        <label class="tat-checkbox-wrap">
-          <input type="checkbox" id="${cbId}" onchange="onTatToggle('${id}', '${section}')">
-          <span class="tat-toggle"><span class="toggle-label">TAT</span></span>
-        </label>
-      </td>
-      <td class="col-time time-cell" id="time-cell-${id}">
-        <span class="no-tat-badge">NO TAT</span>
-      </td>
-      <td class="col-updated" id="updated-${id}">—</td>
-      <td class="col-action">
-        <button class="btn-del" title="Delete" onclick="deleteRow('${id}', '${section}')">✕</button>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
-    updateCount(section);
-    tr.querySelector('input[type="text"]').focus();
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.database();
+    setSyncStatus('wait');
+    startSync();
+  } catch(e) {
+    setSyncStatus('error');
+    startLocalMode();
   }
+}
 
-  function onTatToggle(rowId, section) {
-    const cb = document.getElementById(`cb-${rowId}`);
-    const timeCell = document.getElementById(`time-cell-${rowId}`);
+// ── Real-time sync ────────────────────────────────────────────────
+function startSync() {
+  ['a','b'].forEach(section => {
+    db.ref(`tat/${todayKey}/${section}`).on('value', snap => {
+      const data = snap.val();
+      suppressSave = true;
+      state[section] = data ? Object.values(data) : [];
+      renderSection(section);
+      suppressSave = false;
+      setSyncStatus('live');
 
-    if (cb.checked) {
-      timeCell.innerHTML = `<input type="time"
-        oninput="onFieldChange('${rowId}', '${section}')"
-        onchange="onFieldChange('${rowId}', '${section}')">`;
-      timeCell.querySelector('input').focus();
+      // If empty (new day), add 1 blank row
+      if (state[section].length === 0) addRow(section);
+    }, () => setSyncStatus('error'));
+  });
+}
+
+function saveSection(section) {
+  if (suppressSave || !db) return;
+  const payload = {};
+  state[section].forEach((row, i) => { payload[i] = row; });
+  db.ref(`tat/${todayKey}/${section}`).set(state[section].length ? payload : null)
+    .then(() => setSyncStatus('live'))
+    .catch(() => setSyncStatus('error'));
+}
+
+// ── Local-only mode (no Firebase) ────────────────────────────────
+function startLocalMode() {
+  ['a','b'].forEach(section => {
+    state[section] = [];
+    addRow(section);
+  });
+}
+
+// ── Midnight IST auto-reset ───────────────────────────────────────
+function scheduleMidnightReset() {
+  const now = new Date();
+  const ist = new Date(now.getTime() + 5.5 * 3600000);
+  const next = new Date(ist);
+  next.setUTCHours(18, 30, 0, 0); // 18:30 UTC = 00:00 IST next day
+  if (next <= ist) next.setUTCDate(next.getUTCDate() + 1);
+  const ms = next - ist;
+
+  setTimeout(() => {
+    todayKey = getISTDateKey();
+    if (db) {
+      // Switch listeners to new day key
+      startSync();
     } else {
-      timeCell.innerHTML = `<span class="no-tat-badge">NO TAT</span>`;
+      // local reset
+      ['a','b'].forEach(section => { state[section] = []; renderSection(section); addRow(section); });
     }
-    onFieldChange(rowId, section);
-  }
+    scheduleMidnightReset();
+  }, ms);
+}
 
-  function onFieldChange(rowId, section) {
-    const cell = document.getElementById(`updated-${rowId}`);
-    if (cell) cell.textContent = formatDateTime(new Date());
-    updateFooter(section);
-  }
+// ── Render ────────────────────────────────────────────────────────
+function renderSection(section) {
+  const tbody = document.getElementById(`tbody-${section}`);
+  tbody.innerHTML = '';
+  state[section].forEach((row, i) => appendRowEl(section, row, i));
+  updateCount(section);
+}
 
-  function deleteRow(rowId, section) {
-    const row = document.getElementById(rowId);
-    if (row) row.remove();
-    updateCount(section);
-    document.getElementById(`tbody-${section}`).querySelectorAll('tr').forEach((tr, i) => {
-      tr.querySelector('.col-num').textContent = i + 1;
-    });
-  }
+function appendRowEl(section, row, index) {
+  const tbody = document.getElementById(`tbody-${section}`);
+  const tr = document.createElement('tr');
 
-  function updateCount(section) {
-    const n = document.getElementById(`tbody-${section}`).querySelectorAll('tr').length;
-    document.getElementById(`count-${section}`).textContent = `${n} test${n !== 1 ? 's' : ''}`;
-    updateFooter(section);
-  }
+  const timeCellHTML = row.tat
+    ? `<input type="time" value="${escHtml(row.time||'')}" onchange="onField(this,'${section}',${index},'time')">`
+    : `<span class="no-tat-badge">NO TAT</span>`;
 
-  function updateFooter(section) {
-    const label = section === 'a' ? 'Serology' : 'PCR';
-    document.getElementById(`footer-${section}`).textContent =
-      `${label} · Last edit: ${formatDateTime(new Date())}`;
-  }
+  tr.innerHTML = `
+    <td class="col-num">${index + 1}</td>
+    <td><input type="text" placeholder="Enter test name…" value="${escHtml(row.name||'')}"
+         oninput="onField(this,'${section}',${index},'name')"></td>
+    <td class="col-tat">
+      <label class="tat-cb-wrap">
+        <input type="checkbox" ${row.tat ? 'checked' : ''} onchange="onTAT(this,'${section}',${index})">
+        <span class="tat-toggle"><span class="tlabel">TAT</span></span>
+      </label>
+    </td>
+    <td class="col-time" id="tc-${section}-${index}">${timeCellHTML}</td>
+    <td class="col-upd">${row.updated || '—'}</td>
+    <td class="col-act"><button class="btn-del" onclick="deleteRow('${section}',${index})">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+}
 
-  // Start with 3 rows each
-  addRow('a'); addRow('a'); addRow('a');
-  addRow('b'); addRow('b'); addRow('b');
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+
+// ── Field events ──────────────────────────────────────────────────
+function onField(el, section, index, field) {
+  if (!state[section][index]) return;
+  state[section][index][field] = el.value;
+  state[section][index].updated = formatDT(new Date());
+  el.closest('tr').querySelector('.col-upd').textContent = state[section][index].updated;
+  if (!suppressSave) saveSection(section);
+}
+
+function onTAT(cb, section, index) {
+  if (!state[section][index]) return;
+  state[section][index].tat  = cb.checked;
+  state[section][index].time = '';
+  state[section][index].updated = formatDT(new Date());
+  const tc = document.getElementById(`tc-${section}-${index}`);
+  if (cb.checked) {
+    tc.innerHTML = `<input type="time" onchange="onField(this,'${section}',${index},'time')">`;
+    tc.querySelector('input').focus();
+  } else {
+    tc.innerHTML = `<span class="no-tat-badge">NO TAT</span>`;
+  }
+  cb.closest('tr').querySelector('.col-upd').textContent = state[section][index].updated;
+  if (!suppressSave) saveSection(section);
+}
+
+// ── Add / Delete ──────────────────────────────────────────────────
+function addRow(section) {
+  const newRow = { name:'', tat:false, time:'', updated:'' };
+  state[section].push(newRow);
+  const idx = state[section].length - 1;
+  appendRowEl(section, newRow, idx);
+  updateCount(section);
+  document.getElementById(`tbody-${section}`).lastElementChild
+    .querySelector('input[type="text"]').focus();
+  if (!suppressSave) saveSection(section);
+}
+
+function deleteRow(section, index) {
+  state[section].splice(index, 1);
+  suppressSave = true;
+  renderSection(section);
+  suppressSave = false;
+  saveSection(section);
+}
+
+function updateCount(section) {
+  const n = state[section].length;
+  document.getElementById(`count-${section}`).textContent = `${n} test${n !== 1 ? 's' : ''}`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────
+initFirebase();
+scheduleMidnightReset();
 </script>
 </body>
 </html>
