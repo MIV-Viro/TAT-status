@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Entry — Section A & B</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a23;
+    --surface2: #1e2433;
+    --border: #2a3147;
+    --accent-a: #4fffb0;
+    --accent-b: #ff6b6b;
+    --text: #e8ecf4;
+    --muted: #7a849e;
+    --input-bg: #111520;
+    --radius: 6px;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 10%, rgba(79,255,176,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 90%, rgba(255,107,107,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    margin-bottom: 48px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  header span {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* SECTION */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 32px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.2s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .section-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    flex-shrink: 0;
+  }
+
+  .section-a .section-badge { background: rgba(79,255,176,0.12); color: var(--accent-a); border: 1px solid rgba(79,255,176,0.25); }
+  .section-b .section-badge { background: rgba(255,107,107,0.12); color: var(--accent-b); border: 1px solid rgba(255,107,107,0.25); }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .section-a .section-title { color: var(--accent-a); }
+  .section-b .section-title { color: var(--accent-b); }
+
+  .row-count {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  thead tr {
+    background: var(--input-bg);
+  }
+
+  th {
+    padding: 10px 16px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  th.col-num { width: 42px; color: #4a5470; }
+  th.col-text { width: 42%; }
+  th.col-time { width: 22%; }
+  th.col-updated { width: 28%; }
+  th.col-action { width: 44px; }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(42,49,71,0.6);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td {
+    padding: 8px 10px;
+    vertical-align: middle;
+  }
+
+  td.col-num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: #3d4560;
+    text-align: center;
+    padding: 8px 4px;
+    user-select: none;
+  }
+
+  td.col-updated {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    padding: 8px 16px;
+  }
+
+  td.col-action {
+    text-align: center;
+    padding: 8px 4px;
+  }
+
+  /* INPUTS */
+  input[type="text"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="time"],
+  input[type="datetime-local"] {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  input:focus {
+    border-color: rgba(79,255,176,0.4);
+    box-shadow: 0 0 0 3px rgba(79,255,176,0.07);
+    color: var(--text);
+  }
+
+  .section-b input:focus {
+    border-color: rgba(255,107,107,0.4);
+    box-shadow: 0 0 0 3px rgba(255,107,107,0.07);
+  }
+
+  input::placeholder { color: #3d4865; }
+
+  /* DELETE BUTTON */
+  .btn-del {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: #3d4560;
+    font-size: 1rem;
+    line-height: 1;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .btn-del:hover { background: rgba(255,80,80,0.12); border-color: rgba(255,80,80,0.25); color: #ff6b6b; }
+
+  /* ADD ROW BUTTON */
+  .add-row-wrap {
+    padding: 12px 16px;
+    border-top: 1px dashed var(--border);
+    background: transparent;
+  }
+
+  .btn-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .section-a .btn-add:hover { border-color: var(--accent-a); color: var(--accent-a); background: rgba(79,255,176,0.05); }
+  .section-b .btn-add:hover { border-color: var(--accent-b); color: var(--accent-b); background: rgba(255,107,107,0.05); }
+
+  .btn-add svg { width: 14px; height: 14px; }
+
+  /* FOOTER */
+  .footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--input-bg);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-a);
+    margin-right: 6px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .section-b .live-dot { background: var(--accent-b); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Data Entry</h1>
+    <span>SECTION A &amp; B</span>
+  </header>
+
+  <!-- SECTION A -->
+  <div class="section section-a" id="section-a">
+    <div class="section-header">
+      <div class="section-badge">A</div>
+      <div class="section-title">Section A</div>
+      <div class="row-count" id="count-a">0 rows</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-num">#</th>
+            <th class="col-text">TEXT DATA</th>
+            <th class="col-time">TIME</th>
+            <th class="col-updated">LAST UPDATED</th>
+            <th class="col-action"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-a"></tbody>
+      </table>
+    </div>
+    <div class="add-row-wrap">
+      <button class="btn-add" onclick="addRow('a')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Row
+      </button>
+    </div>
+    <div class="footer-bar">
+      <span><span class="live-dot"></span>Live tracking updates</span>
+      <span id="footer-a">Section A</span>
+    </div>
+  </div>
+
+  <!-- SECTION B -->
+  <div class="section section-b" id="section-b">
+    <div class="section-header">
+      <div class="section-badge">B</div>
+      <div class="section-title">Section B</div>
+      <div class="row-count" id="count-b">0 rows</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-num">#</th>
+            <th class="col-text">TEXT DATA</th>
+            <th class="col-time">TIME</th>
+            <th class="col-updated">LAST UPDATED</th>
+            <th class="col-action"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-b"></tbody>
+      </table>
+    </div>
+    <div class="add-row-wrap">
+      <button class="btn-add" onclick="addRow('b')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Row
+      </button>
+    </div>
+    <div class="footer-bar">
+      <span><span class="live-dot"></span>Live tracking updates</span>
+      <span id="footer-b">Section B</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let rowCounters = { a: 0, b: 0 };
+
+  function formatDateTime(d) {
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  function addRow(section) {
+    const tbody = document.getElementById(`tbody-${section}`);
+    rowCounters[section]++;
+    const idx = rowCounters[section];
+    const id = `row-${section}-${idx}`;
+
+    const tr = document.createElement('tr');
+    tr.id = id;
+
+    tr.innerHTML = `
+      <td class="col-num">${idx}</td>
+      <td>
+        <input type="text" placeholder="Enter text data…"
+          oninput="onFieldChange('${id}', '${section}')"
+          onchange="onFieldChange('${id}', '${section}')">
+      </td>
+      <td>
+        <input type="time"
+          oninput="onFieldChange('${id}', '${section}')"
+          onchange="onFieldChange('${id}', '${section}')">
+      </td>
+      <td class="col-updated" id="updated-${id}">—</td>
+      <td class="col-action">
+        <button class="btn-del" title="Delete row" onclick="deleteRow('${id}', '${section}')">✕</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+    updateCount(section);
+
+    // focus the text input
+    tr.querySelector('input[type="text"]').focus();
+  }
+
+  function onFieldChange(rowId, section) {
+    const cell = document.getElementById(`updated-${rowId}`);
+    if (cell) {
+      cell.textContent = formatDateTime(new Date());
+    }
+    updateFooter(section);
+  }
+
+  function deleteRow(rowId, section) {
+    const row = document.getElementById(rowId);
+    if (row) row.remove();
+    updateCount(section);
+    // Renumber
+    const tbody = document.getElementById(`tbody-${section}`);
+    tbody.querySelectorAll('tr').forEach((tr, i) => {
+      tr.querySelector('.col-num').textContent = i + 1;
+    });
+  }
+
+  function updateCount(section) {
+    const tbody = document.getElementById(`tbody-${section}`);
+    const n = tbody.querySelectorAll('tr').length;
+    document.getElementById(`count-${section}`).textContent = `${n} row${n !== 1 ? 's' : ''}`;
+    updateFooter(section);
+  }
+
+  function updateFooter(section) {
+    const label = section === 'a' ? 'Section A' : 'Section B';
+    document.getElementById(`footer-${section}`).textContent =
+      `${label} · Last edit: ${formatDateTime(new Date())}`;
+  }
+
+  // Start with 3 rows each
+  addRow('a'); addRow('a'); addRow('a');
+  addRow('b'); addRow('b'); addRow('b');
+</script>
+</body>
+</html>
